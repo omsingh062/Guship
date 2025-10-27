@@ -3,7 +3,7 @@ import e from 'express';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import {generateToken} from "../lib/utils.js";
-import { ENV } from '../lib/env.js';
+
 
 
 export const signup = async (req, res) => {
@@ -39,13 +39,6 @@ export const signup = async (req, res) => {
             generateToken(res, savedUser._id);
 
              res.status(201).json({_id: newUser._id, fullname: newUser.fullname, email: newUser.email, profilePic: newUser.profilePic});
-
-
-             try{
-                await sendWelcomeEmail(savedUser.email, savedUser.fullName,     ENV.CLIENT_URL);
-             }catch(err){
-                console.error("Failed to send welcome email:", err);
-             }
         }else{
             return res.status(400).json({message:"Invalid user data"});
         }
