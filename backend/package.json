@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
 =======
@@ -13,6 +14,12 @@
 
 >>>>>>> 3cc192a (Fix server startup and DB connect order)
   },
+=======
+  "start": "node src/server.js",
+  "dev": "nodemon src/server.js"
+}
+,
+>>>>>>> 6bb5209 (Fix server startup and DB connect order)
   "keywords": [],
   "author": "",
   "license": "ISC",
