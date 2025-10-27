@@ -4,8 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
+=======
+  "dev": "nodemon src/server.js",
+   "start": "node src/server.js"
+
+>>>>>>> 3cc192a (Fix server startup and DB connect order)
   },
   "keywords": [],
   "author": "",
