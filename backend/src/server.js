@@ -10,7 +10,9 @@ const __dirname = Path.resolve();
 
 const PORT = ENV.PORT || process.env.PORT || 3000;
 
+// ✅ Body parsers (both JSON & urlencoded)
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // <--- ADD THIS ✅
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
@@ -26,7 +28,6 @@ connectDB().then(() => {
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ Server running on port: ${PORT}`);
   });
-
 }).catch((err) => {
   console.error("❌ Database Connection Failed:", err);
   process.exit(1);
