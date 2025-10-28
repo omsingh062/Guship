@@ -26,6 +26,7 @@ if (ENV.NODE_ENV === "production") {
 
 connectDB().then(() => {
 <<<<<<< HEAD
+<<<<<<< HEAD
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ Server running on port: ${PORT}`);
   });
@@ -35,6 +36,12 @@ connectDB().then(() => {
     console.log("✅ Server is running on port: " + PORT);
   });
 >>>>>>> 3cc192a (Fix server startup and DB connect order)
+=======
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`✅ Server running on port: ${PORT}`);
+  });
+
+>>>>>>> 1942654 (Fix: use node instead of nodemon in production)
 }).catch((err) => {
   console.error("❌ Database Connection Failed:", err);
   process.exit(1);

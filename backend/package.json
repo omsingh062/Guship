@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+ 
+ 
   "scripts": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "start": "node src/server.js",
@@ -20,6 +23,13 @@
 }
 ,
 >>>>>>> 6bb5209 (Fix server startup and DB connect order)
+=======
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  }
+  , 
+
+>>>>>>> 1942654 (Fix: use node instead of nodemon in production)
   "keywords": [],
   "author": "",
   "license": "ISC",
