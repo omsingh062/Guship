@@ -8,10 +8,6 @@ import cloudinary from "../lib/cloudinary.js";
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
 
-  if(!email || !password ){
-    return res.status(400).json({ message: "Email and password are required" });
-  }
-
   try {
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
