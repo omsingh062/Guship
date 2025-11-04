@@ -1,40 +1,41 @@
+// backend/src/server.js
+import "dotenv/config"; // MUST be first
 import express from "express";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
-import Path from "path";
-import { connectDB } from "./lib/db.js";
-import { ENV } from "./lib/env.js";
 
-const app = express();
-const __dirname = Path.resolve();
-const PORT = ENV.PORT || process.env.PORT || 3000;
+// IMPORTANT: import socket AFTER dotenv/config so envs are available there too
+import { app, server } from "./lib/socket.js";
 
-// ✅ Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const PORT = process.env.PORT || 3000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 
-// ✅ Routes
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-// ✅ Serve frontend in production
-if (ENV.NODE_ENV === "production") {
-  app.use(express.static(Path.join(__dirname, "../frontend/dist")));
-  app.get("*", (_, res) => {
-    res.sendFile(Path.resolve(__dirname, "../frontend/dist/index.html"));
-  });
-}
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+app.get("*", (_, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
 
-// ✅ Database & Server
 connectDB()
   .then(() => {
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`✅ Server running on port: ${PORT}`);
-    });
+    server.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
   })
-  .catch((err) => {
-    console.error("❌ Database Connection Failed:", err);
-    process.exit(1);
-  });
+  .catch((err) => console.error("DB connect failed:", err));
