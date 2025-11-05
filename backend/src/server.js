@@ -1,51 +1,43 @@
-// server.js
 import express from "express";
-import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 import path from "path";
+import { fileURLToPath } from "url";
 import cors from "cors";
 
-import authRoutes from "./routes/auth.route.js";
-import messageRoutes from "./routes/message.route.js";
-import { connectDB } from "./lib/db.js";
-import { ENV } from "./lib/env.js";
-import { app, server } from "./lib/socket.js";
+// Import routes
+import userRoutes from "./routes/userRoutes.js";
 
-// Resolve __dirname for ES Modules
-const __dirname = path.resolve();
+dotenv.config();
 
-// Use platform PORT if available, else fallback to ENV.PORT or 3000
-const PORT = process.env.PORT || ENV.PORT || 3000;
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
-app.use(express.json({ limit: "5mb" }));
-app.use(cookieParser());
+app.use(express.json());
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  credentials: true,
+}));
 
-// Allow CORS only from frontend URL
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
-
-// API routes
-app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
+// API Routes
+app.use("/api/users", userRoutes);
 
 // Serve frontend in production
-if (ENV.NODE_ENV === "production") {
-  const frontendPath = path.join(__dirname, "../frontend/dist");
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
-  app.use(express.static(frontendPath));
-
-  // Catch all other routes and serve index.html
-  app.get("*", (_, res) => {
-    res.sendFile(path.join(frontendPath, "index.html"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("Server is running!");
   });
 }
 
-// Start server and connect to DB
-server.listen(PORT, async () => {
-  console.log(`Server running on port: ${PORT}`);
-  try {
-    await connectDB();
-    console.log("MongoDB connected successfully");
-  } catch (err) {
-    console.error("MongoDB connection failed:", err);
-  }
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
