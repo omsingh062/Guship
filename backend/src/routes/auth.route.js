@@ -1,4 +1,4 @@
-// backend/src/routes/authRoutes.js
+// backend/src/routes/auth.route.js
 import express from "express";
 import { signup, login, logout, updateProfile } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
@@ -6,19 +6,16 @@ import { arcjetProtection } from "../middleware/arcjet.middleware.js";
 
 const router = express.Router();
 
-// Apply Arcjet protection middleware to all routes in this router
+// Apply Arcjet protection to all auth routes
 router.use(arcjetProtection);
 
 // Public routes
-router.post("/signup", signup);  // Register a new user
-router.post("/login", login);    // Login user
-router.post("/logout", logout);  // Logout user
+router.post("/signup", signup);
+router.post("/login", login);
+router.post("/logout", logout);
 
-// Protected routes (requires authentication)
-router.put("/update-profile", protectRoute, updateProfile);  // Update user profile
-router.get("/check", protectRoute, (req, res) => {
-  // Returns the current logged-in user
-  res.status(200).json(req.user);
-});
+// Protected routes
+router.put("/update-profile", protectRoute, updateProfile);
+router.get("/check", protectRoute, (req, res) => res.status(200).json(req.user));
 
 export default router;
