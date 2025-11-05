@@ -10,13 +10,11 @@ import { ENV } from "./lib/env.js";
 import { app, server } from "./lib/socket.js";
 
 const __dirname = path.resolve();
-
-// ✅ Use platform-assigned port first
-const PORT = process.env.PORT || ENV.PORT || 3000;
+const PORT = ENV.PORT || 3000;
 
 // Middleware
 app.use(express.json({ limit: "5mb" }));
-app.use(cors({ origin: ENV.CLIENT_URL || "*", credentials: true }));
+app.use(cors({ origin: ENV.CLIENT_URL || "http://localhost:5173", credentials: true }));
 app.use(cookieParser());
 
 // Routes
