@@ -1,3 +1,4 @@
+// server.js
 import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -9,27 +10,42 @@ import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
 import { app, server } from "./lib/socket.js";
 
+// Resolve __dirname for ES Modules
 const __dirname = path.resolve();
 
-const PORT = ENV.PORT || 3000;
+// Use platform PORT if available, else fallback to ENV.PORT or 3000
+const PORT = process.env.PORT || ENV.PORT || 3000;
 
-app.use(express.json({ limit: "5mb" })); // req.body
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+// Middleware
+app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
 
+// Allow CORS only from frontend URL
+app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+
+// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-// make ready for deployment
+// Serve frontend in production
 if (ENV.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  const frontendPath = path.join(__dirname, "../frontend/dist");
 
+  app.use(express.static(frontendPath));
+
+  // Catch all other routes and serve index.html
   app.get("*", (_, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+    res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
 
-server.listen(PORT, () => {
-  console.log("Server running on port: " + PORT);
-  connectDB();
+// Start server and connect to DB
+server.listen(PORT, async () => {
+  console.log(`Server running on port: ${PORT}`);
+  try {
+    await connectDB();
+    console.log("MongoDB connected successfully");
+  } catch (err) {
+    console.error("MongoDB connection failed:", err);
+  }
 });
