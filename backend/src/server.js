@@ -1,3 +1,4 @@
+// backend/src/server.js
 import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -7,27 +8,28 @@ import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
-import { app, server } from "./lib/socket.js";
+import { app as socketApp, server } from "./lib/socket.js";
 
-const __dirname = path.resolve();
+// Use PORT from env or default 3000
 const PORT = ENV.PORT || 3000;
 
 // Middleware
-app.use(express.json({ limit: "5mb" }));
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
-app.use(cookieParser());
+socketApp.use(express.json({ limit: "5mb" }));
+socketApp.use(cors({ origin: ENV.CLIENT_URL || "*", credentials: true }));
+socketApp.use(cookieParser());
 
 // API Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
+socketApp.use("/api/auth", authRoutes);
+socketApp.use("/api/messages", messageRoutes);
 
 // Serve frontend in production
 if (ENV.NODE_ENV === "production") {
-  const frontendDist = path.join(__dirname, "../frontend/dist");
-  app.use(express.static(frontendDist));
+  const frontendDistPath = path.join(process.cwd(), "frontend", "dist");
+  socketApp.use(express.static(frontendDistPath));
 
-  app.get("*", (_, res) => {
-    res.sendFile(path.join(frontendDist, "index.html"));
+  // Always serve index.html for any non-API route
+  socketApp.get("*", (_, res) => {
+    res.sendFile(path.join(frontendDistPath, "index.html"));
   });
 }
 
