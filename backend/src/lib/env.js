@@ -1,7 +1,7 @@
- import "dotenv/config";
+import "dotenv/config";
 
 export const ENV = {
-  PORT: process.env.PORT,
+  PORT: process.env.PORT, // Sevalla sets this automatically
   MONGO_URI: process.env.MONGO_URI,
   JWT_SECRET: process.env.JWT_SECRET,
   NODE_ENV: process.env.NODE_ENV,

@@ -9,46 +9,38 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ENV.CLIENT_URL,
+    origin: ENV.CLIENT_URL || "*",
     credentials: true,
   },
 });
 
-// Store online users: { userId: socketId }
+// Store online users
 const userSocketMap = {};
 
-// Utility to get socketId by userId
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
 }
 
-// Apply authentication middleware
+// Authentication middleware
 io.use(socketAuthMiddleware);
 
 io.on("connection", (socket) => {
-  const user = socket.user; // from middleware
+  const user = socket.user;
   if (!user) return socket.disconnect();
 
   console.log("A user connected:", user.fullName);
+  userSocketMap[user._id] = socket.id;
 
-  // Store socketId using _id as string
-  userSocketMap[user._id.toString()] = socket.id;
-
-  // Broadcast current online users
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-  // Listen to chat events
   socket.on("send-message", (data) => {
     const receiverSocketId = getReceiverSocketId(data.receiverId);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("receive-message", data);
-    }
+    if (receiverSocketId) io.to(receiverSocketId).emit("receive-message", data);
   });
 
-  // Disconnect
   socket.on("disconnect", () => {
     console.log("A user disconnected:", user.fullName);
-    delete userSocketMap[user._id.toString()];
+    delete userSocketMap[user._id];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });

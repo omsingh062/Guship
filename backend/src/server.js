@@ -1,4 +1,3 @@
-// backend/src/server.js
 import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -12,12 +11,12 @@ import { app, server } from "./lib/socket.js";
 
 const __dirname = path.resolve();
 
-// Use PORT from env (cloud) or 3000 locally
-const PORT = ENV.PORT || 8080;
+// ✅ Use platform-assigned port first
+const PORT = process.env.PORT || ENV.PORT || 3000;
 
 // Middleware
 app.use(express.json({ limit: "5mb" }));
-app.use(cors({ origin: ENV.CLIENT_URL || "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: ENV.CLIENT_URL || "*", credentials: true }));
 app.use(cookieParser());
 
 // Routes
