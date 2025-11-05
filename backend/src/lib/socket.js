@@ -1,4 +1,3 @@
-// backend/src/lib/socket.js
 import { Server } from "socket.io";
 import http from "http";
 import express from "express";
@@ -32,13 +31,13 @@ io.on("connection", (socket) => {
 
   console.log("A user connected:", user.fullName);
 
-  // Store socketId
-  userSocketMap[user.id] = socket.id;
+  // Store socketId using _id as string
+  userSocketMap[user._id.toString()] = socket.id;
 
   // Broadcast current online users
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-  // Listen to events from client here (e.g., chat messages)
+  // Listen to chat events
   socket.on("send-message", (data) => {
     const receiverSocketId = getReceiverSocketId(data.receiverId);
     if (receiverSocketId) {
@@ -46,9 +45,10 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Disconnect
   socket.on("disconnect", () => {
     console.log("A user disconnected:", user.fullName);
-    delete userSocketMap[user.id];
+    delete userSocketMap[user._id.toString()];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });
