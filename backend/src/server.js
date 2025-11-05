@@ -13,7 +13,7 @@ import { app, server } from "./lib/socket.js";
 const __dirname = path.resolve();
 
 // Use PORT from env (cloud) or 3000 locally
-const PORT = ENV.PORT || 3000;
+const PORT = ENV.PORT || 8080;
 
 // Middleware
 app.use(express.json({ limit: "5mb" }));
