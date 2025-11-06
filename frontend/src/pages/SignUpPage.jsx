@@ -8,8 +8,7 @@ import {
   UserIcon,
   LoaderIcon,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { Link } from "react-router";
 
 function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -18,40 +17,10 @@ function SignUpPage() {
     password: "",
   });
   const { signup, isSigningUp } = useAuthStore();
-  const navigate = useNavigate();
 
-  // ✅ Email format validator
-  const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-
-  // ✅ Handle form submit
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    // --- Input validations ---
-    if (!formData.fullName.trim()) {
-      toast.error("⚠️ Full name is required!");
-      return;
-    }
-
-    if (!validateEmail(formData.email)) {
-      toast.error("⚠️ Please enter a valid email address!");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast.error("⚠️ Password must be at least 6 characters long!");
-      return;
-    }
-
-    // --- Signup Request ---
-    const success = await signup(formData);
-    if (success) {
-      console.log("✅ Signup success, navigating to home...");
-      navigate("/"); // ✅ redirect to home page
-    }
+    signup(formData);
   };
 
   return (
@@ -59,9 +28,10 @@ function SignUpPage() {
       <div className="relative w-full max-w-6xl md:h-[800px] h-[650px]">
         <BorderAnimatedContainer>
           <div className="w-full flex flex-col md:flex-row">
-            {/* FORM SECTION */}
+            {/* FORM CLOUMN - LEFT SIDE */}
             <div className="md:w-1/2 p-8 flex items-center justify-center md:border-r border-slate-600/30">
               <div className="w-full max-w-md">
+                {/* HEADING TEXT */}
                 <div className="text-center mb-8">
                   <MessageCircleIcon className="w-12 h-12 mx-auto text-slate-400 mb-4" />
                   <h2 className="text-2xl font-bold text-slate-200 mb-2">
@@ -70,60 +40,55 @@ function SignUpPage() {
                   <p className="text-slate-400">Sign up for a new account</p>
                 </div>
 
+                {/* FORM */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* FULL NAME */}
                   <div>
                     <label className="auth-input-label">Full Name</label>
                     <div className="relative">
                       <UserIcon className="auth-input-icon" />
+
                       <input
                         type="text"
                         value={formData.fullName}
                         onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            fullName: e.target.value,
-                          })
+                          setFormData({ ...formData, fullName: e.target.value })
                         }
                         className="input"
-                        placeholder="username"
+                        placeholder="John Doe"
                       />
                     </div>
                   </div>
 
-                  {/* EMAIL */}
+                  {/* EMAIL INPUT */}
                   <div>
                     <label className="auth-input-label">Email</label>
                     <div className="relative">
                       <MailIcon className="auth-input-icon" />
+
                       <input
                         type="email"
                         value={formData.email}
                         onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            email: e.target.value,
-                          })
+                          setFormData({ ...formData, email: e.target.value })
                         }
                         className="input"
-                        placeholder="xyz@gmail.com"
+                        placeholder="johndoe@gmail.com"
                       />
                     </div>
                   </div>
 
-                  {/* PASSWORD */}
+                  {/* PASSWORD INPUT */}
                   <div>
                     <label className="auth-input-label">Password</label>
                     <div className="relative">
                       <LockIcon className="auth-input-icon" />
+
                       <input
                         type="password"
                         value={formData.password}
                         onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            password: e.target.value,
-                          })
+                          setFormData({ ...formData, password: e.target.value })
                         }
                         className="input"
                         placeholder="Enter your password"
@@ -153,7 +118,7 @@ function SignUpPage() {
               </div>
             </div>
 
-            {/* IMAGE SECTION */}
+            {/* FORM ILLUSTRATION - RIGHT SIDE */}
             <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-gradient-to-bl from-slate-800/20 to-transparent">
               <div>
                 <img
@@ -180,5 +145,4 @@ function SignUpPage() {
     </div>
   );
 }
-
 export default SignUpPage;
