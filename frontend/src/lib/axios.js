@@ -7,5 +7,5 @@ const BASE_URL =
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // important for cookies/auth
+  withCredentials: true
 });
