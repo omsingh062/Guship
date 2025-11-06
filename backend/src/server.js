@@ -15,13 +15,10 @@ const PORT = ENV.PORT || 3000;
 // Middleware
 socketApp.use(express.json({ limit: "5mb" }));
 socketApp.use(cookieParser());
-
-// Safe CORS
 socketApp.use(
   cors({
     origin: (origin, callback) => {
-      const allowed = ENV.CLIENT_URL;
-      if (!origin || origin === allowed) callback(null, true);
+      if (!origin || origin === ENV.CLIENT_URL) callback(null, true);
       else callback(new Error("CORS not allowed"));
     },
     credentials: true,
@@ -36,7 +33,6 @@ socketApp.use("/api/messages", messageRoutes);
 if (ENV.NODE_ENV === "production") {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-
   const frontendPath = path.join(__dirname, "../../frontend/dist");
   console.log("✅ Serving frontend from:", frontendPath);
 
