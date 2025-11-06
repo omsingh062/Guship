@@ -12,32 +12,27 @@ import { app as socketApp, server } from "./lib/socket.js";
 
 const PORT = ENV.PORT || 3000;
 
-// ------------------------
 // Middleware
-// ------------------------
 socketApp.use(express.json({ limit: "5mb" }));
 socketApp.use(cookieParser());
 
-// Automatic CORS
-const allowedOrigin = ENV.CLIENT_URL;
-console.log("🌐 CORS allowed origin:", allowedOrigin);
-
+// Safe CORS
 socketApp.use(
   cors({
-    origin: allowedOrigin,
+    origin: (origin, callback) => {
+      const allowed = ENV.CLIENT_URL;
+      if (!origin || origin === allowed) callback(null, true);
+      else callback(new Error("CORS not allowed"));
+    },
     credentials: true,
   })
 );
 
-// ------------------------
 // API Routes
-// ------------------------
 socketApp.use("/api/auth", authRoutes);
 socketApp.use("/api/messages", messageRoutes);
 
-// ------------------------
 // Serve Frontend in Production
-// ------------------------
 if (ENV.NODE_ENV === "production") {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -46,15 +41,12 @@ if (ENV.NODE_ENV === "production") {
   console.log("✅ Serving frontend from:", frontendPath);
 
   socketApp.use(express.static(frontendPath));
-
   socketApp.get("*", (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
 
-// ------------------------
 // Start Server
-// ------------------------
 server.listen(PORT, () => {
   console.log(`✅ Server running on port: ${PORT}`);
   connectDB();
