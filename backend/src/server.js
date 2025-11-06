@@ -12,33 +12,37 @@ import { app as socketApp, server } from "./lib/socket.js";
 
 const PORT = ENV.PORT || 3000;
 
-// ----------------- MIDDLEWARE -----------------
+// --- Middleware ---
 socketApp.use(express.json({ limit: "5mb" }));
 socketApp.use(cookieParser());
 
-// CORS: allow local dev + deployed frontend
+// --- CORS Setup ---
+const allowedOrigins = [
+  "http://localhost:5173",                  // local dev
+  ENV.CLIENT_URL,                           // deployed frontend
+];
+
 socketApp.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = [
-        ENV.CLIENT_URL, // local dev, e.g., http://localhost:5173
-        "https://guship-hut8-9xoylcq44-omsingh062s-projects.vercel.app" // Vercel frontend
-      ];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("CORS not allowed"));
+        console.warn("Blocked CORS for:", origin);
+        callback(new Error(`CORS not allowed for origin: ${origin}`));
       }
     },
-    credentials: true, // allow cookies/auth headers
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// ----------------- API ROUTES -----------------
+// --- API Routes ---
 socketApp.use("/api/auth", authRoutes);
 socketApp.use("/api/messages", messageRoutes);
 
-// ----------------- SERVE FRONTEND -----------------
+// --- Serve Frontend in Production ---
 if (ENV.NODE_ENV === "production") {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -47,12 +51,14 @@ if (ENV.NODE_ENV === "production") {
   console.log("✅ Serving frontend from:", frontendPath);
 
   socketApp.use(express.static(frontendPath));
+
+  // Catch-all for client-side routes
   socketApp.get("*", (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
 
-// ----------------- START SERVER -----------------
+// --- Start Server ---
 server.listen(PORT, () => {
   console.log(`✅ Server running on port: ${PORT}`);
   connectDB();
