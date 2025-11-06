@@ -3,6 +3,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
+import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
@@ -23,11 +24,12 @@ socketApp.use("/api/messages", messageRoutes);
 
 // ✅ Serve Frontend in Production
 if (ENV.NODE_ENV === "production") {
-  const __dirname = path.resolve();
-  const frontendPath = path.join(__dirname, "../frontend/dist");
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+
+  const frontendPath = path.join(__dirname, "..", "..", "frontend", "dist");
 
   socketApp.use(express.static(frontendPath));
-
   socketApp.get("*", (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
