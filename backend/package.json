@@ -4,10 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "postinstall": "cd ../frontend && npm install && npm run build"
-  },
+  "dev": "nodemon src/server.js",
+  "start": "node src/server.js"
+},
   "dependencies": {
     "express": "^4.21.2",
     "cors": "^2.8.5",
